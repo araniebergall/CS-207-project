@@ -1,0 +1,96 @@
+/*
+Title: Window opener
+By: Alex Niebergall
+moddifeied: Sweep
+Date: December 4 2017
+material: wires, servo FEETECH 6 KG 360 DEGREES CONTINUOUS ROTATION SERVO
+tempture sensor, 3 led, 560 resistors.
+purpose: This is to open the window when is to hot to cool the room down and when to hot close the window
+*/
+
+
+double AnalogToVolts(int reading); // Function for converting the analog to volts.
+#include <Servo.h> // include some data that is not include
+Servo myservo;// servo object
+
+
+void setup() {
+  
+  
+  myservo.attach(9);// setting up where the servo pin would be
+  pinMode(7,OUTPUT); // setting up led pins loctions to be used
+  pinMode(6,OUTPUT);
+  pinMode(5,OUTPUT);
+  Serial.begin(9600); // setting up serial commucation
+  
+}
+
+void loop() {
+ 
+double reading;
+
+
+int pos = 0;
+
+
+  double volts;
+  reading = analogRead(A1);// assigning the tempture informtions to a variable
+ 
+  
+  volts = AnalogToVolts(reading);  //Function call
+  
+   
+    Serial.println(volts); // prints the volts store data
+   if(volts < 0.50){// this is the cold where the minumum of the cold can be handle
+    Serial.println("I am Cold");// this is to tell it cold
+    digitalWrite(7,LOW); // turns on or off the corsponeding light to show the hot,cold or just right.
+    delay(5);
+    digitalWrite(6,LOW);
+    delay(5);
+    digitalWrite(5,HIGH);
+    delay(5);
+    for(pos = 180; pos>=1; pos-=1)     // goes from 180 degrees to 0 degrees 
+  {                                
+    myservo.write(pos);              //  this also moves the mottor to close the window tell servo to go to position in variable 'pos' 
+    delay(15);                       // waits 15ms for the servo to reach the position 
+  } 
+    } 
+   if(volts > 0.60){ // this is to open the window to cool down
+    Serial.println("I am Hot");
+    digitalWrite(7,HIGH);// turns on or off the lights to show the hot, cold , normal 
+    delay(5);
+    digitalWrite(6,LOW);
+    delay(5);
+    digitalWrite(5,LOW);
+    delay(5);
+  
+  for(pos = 0; pos < 180; pos += 1)  // This turn on the servo to open the windowgoes from 0 degrees to 180 degrees 
+  {                                  // in steps of 1 degree 
+    myservo.write(pos);              // tell servo to go to position in variable 'pos' 
+    delay(15);                       // waits 15ms for the servo to reach the position 
+  } 
+   }
+  
+   if( 0.60 < volts && volts < 0.70) {// all this dose is nothing with the servo but turns on the lights for green.
+    digitalWrite(7,LOW);
+    delay(5);
+    digitalWrite(6,HIGH);
+    delay(5);
+    digitalWrite(5,LOW);
+    delay(5);
+   }
+   
+  
+}
+  
+
+double AnalogToVolts(double reading)// recives form the main and is now going to change the amolog to volts
+{
+  
+  double volts;
+  volts = reading/1023.0 * 5.0;  //Perform conversion
+ 
+  return volts; //Return result to main
+}
+
+
